@@ -18,11 +18,11 @@ class Message extends Component {
     }
 
     render() {
-        return (<div class={ this.props.message.read ? "row message read" : "row message unread"}>
+        return (<div class={"row message " + (this.props.message.read ? "read " : "unread ") + (this.state.isSelected ? "selected" : "")}>
         <div class="col-xs-1">
           <div class="row">
             <div class="col-xs-2">
-              { this.state.isSelected ? <input type="checkbox" checked="checked" onChange={this.setChecked}/> : <input type="checkbox" onChange={this.setChecked}/>} 
+              <input type="checkbox" onChange={this.setChecked} /> 
             </div>
             <div class="col-xs-2">
               { this.state.msg.starred ? <i class="star fa fa-star" onClick={this.setStarred}></i> : <i class="star fa fa-star-o" onClick={this.setStarred}></i> }
