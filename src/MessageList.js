@@ -4,9 +4,14 @@ import dataList from './data'
 
 class MessageList extends Component {
 
+    constructor() {
+        super();
+        this.state = { msgList: dataList}
+    }
+
     render() {
         return (<div className="container">
-            { dataList.map(listItem => <Message message={listItem}/>) }
+            { this.state.msgList.map(listItem => <Message message={listItem} setStarred={this.setStarred}/>) }
         </div>)
     }
 

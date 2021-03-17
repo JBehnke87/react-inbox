@@ -1,6 +1,7 @@
 import './App.css';
 import MessageList from './MessageList'
 import Toolbar from './Toolbar'
+import dataList from './data'
 
 import { Component } from 'react';
 
@@ -34,7 +35,7 @@ class App extends Component {
             </div>
           </div>
         </form>
-        <MessageList />
+        <MessageList key={dataList}/>
       </div>
     )
   }

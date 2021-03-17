@@ -2,11 +2,19 @@ import { Component } from "react";
 
 class Message extends Component {
 
-    state = { isSelected: "true" }
-
     constructor(props) {
       super(props);
-      console.log(props)
+      this.state = { msg: this.props.message, isSelected: false };
+      console.log(this.state.msg)
+    }
+
+    setChecked = () => {
+      this.setState({ isSelected: this.state.isSelected ? false : true})
+    }
+
+    setStarred = () => {
+      let oldValue = this.state.msg.starred;
+      this.setState({msg : { starred: !oldValue}})
     }
 
     render() {
@@ -14,10 +22,10 @@ class Message extends Component {
         <div class="col-xs-1">
           <div class="row">
             <div class="col-xs-2">
-              <input type="checkbox"/>
+              { this.state.isSelected ? <input type="checkbox" checked="checked" onChange={this.setChecked}/> : <input type="checkbox" onChange={this.setChecked}/>} 
             </div>
             <div class="col-xs-2">
-              { this.props.message.starred ? <i class="star fa fa-star"></i> : <i class="star fa fa-star-o"></i> }
+              { this.state.msg.starred ? <i class="star fa fa-star" onClick={this.setStarred}></i> : <i class="star fa fa-star-o" onClick={this.setStarred}></i> }
             </div>
           </div>
         </div>
