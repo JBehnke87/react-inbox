@@ -1,25 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
+import MessageList from './MessageList'
+import Toolbar from './Toolbar'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Component } from 'react';
+
+class App extends Component {
+
+  render() {
+    return (
+      <div className="App">
+        <Toolbar />
+        <form class="form-horizontal well">
+          <div class="form-group">
+            <div class="col-sm-8 col-sm-offset-2">
+              <h4>Compose Message</h4>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject" class="col-sm-2 control-label">Subject</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="subject" placeholder="Enter a subject" name="subject"></input>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="body" class="col-sm-2 control-label">Body</label>
+            <div class="col-sm-8">
+              <textarea name="body" id="body" class="form-control"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-8 col-sm-offset-2">
+              <input type="submit" value="Send" class="btn btn-primary"></input>
+            </div>
+          </div>
+        </form>
+        <MessageList />
+      </div>
+    )
+  }
 }
 
 export default App;
