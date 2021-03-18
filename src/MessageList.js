@@ -1,17 +1,11 @@
 import { Component } from "react";
 import Message from './Message'
-import dataList from './data'
 
 class MessageList extends Component {
-
-    constructor() {
-        super();
-        this.state = { msgList: dataList}
-    }
-
     render() {
+        { console.log("MsgList is rendered") }
         return (<div className="container">
-            { this.state.msgList.map(listItem => <Message message={listItem} setStarred={this.setStarred}/>) }
+            { this.props.allMessages.map((listItem, i) => <Message key={i} allMessages={this.props.allMessages} message={listItem} selectOne={this.props.selectOne} setStarred={this.props.setStarred} />)}
         </div>)
     }
 
