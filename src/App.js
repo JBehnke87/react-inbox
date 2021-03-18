@@ -9,7 +9,7 @@ class App extends Component {
 
   constructor() {
     super();
-    this.state = { allMessages: dataList}
+    this.state = { allMessages: dataList }
   }
 
   setStarred = (id) => {
@@ -25,8 +25,16 @@ class App extends Component {
   selectOne = (id) => {
     let newList = this.state.allMessages.map(msg => msg.id === id ? ({ ...msg, selected: !msg.selected }) : ({ ...msg, selected: msg.selected }));
     this.setState({ allMessages: newList })
+  }
 
-    setTimeout(() => { console.log("AllMessagesAfterSelectOne", this.state.allMessages) }, 1000);
+  markAsRead = (value) => {
+    let newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, read: value }) : ({ ...msg, read: msg.read }));
+    this.setState({ allMessages: newList })
+  }
+
+  deleteMsg = () => {
+    let newList = this.state.allMessages.filter(msg => msg.selected != true);
+    this.setState({ allMessages: newList })
   }
 
   render() {
@@ -34,8 +42,7 @@ class App extends Component {
 
     return (
       <div className="App">
-        { this.state.selectedCounter}
-        <Toolbar allMessages={this.state.allMessages} selectAll={this.selectAll} selectedCounter={this.state.selectedCounter} />
+        <Toolbar allMessages={this.state.allMessages} selectAll={this.selectAll} deleteMsg={this.deleteMsg} markAsRead={this.markAsRead} />
         <form className="form-horizontal well">
           <div className="form-group">
             <div className="col-sm-8 col-sm-offset-2">
