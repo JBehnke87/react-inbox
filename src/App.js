@@ -7,42 +7,68 @@ import { Component } from 'react';
 
 class App extends Component {
 
-  constructor() {
-    super();
-    this.state = { allMessages: dataList }
+  state = { allMessages: dataList }
+
+  setNewState = (newList) => {
+    this.setState({ allMessages: newList })
   }
 
   setStarred = (id) => {
     let newList = this.state.allMessages.map(msg => msg.id === id ? ({ ...msg, starred: !msg.starred }) : ({ ...msg, starred: msg.starred }));
-    this.setState({ allMessages: newList })
+    this.setNewState(newList);
   }
 
   selectAll = (value) => {
     let newList = this.state.allMessages.map(msg => ({ ...msg, selected: value }));
-    this.setState({ allMessages: newList })
+    this.setNewState(newList);
   }
 
   selectOne = (id) => {
     let newList = this.state.allMessages.map(msg => msg.id === id ? ({ ...msg, selected: !msg.selected }) : ({ ...msg, selected: msg.selected }));
-    this.setState({ allMessages: newList })
+    this.setNewState(newList);
   }
 
   markAsRead = (value) => {
     let newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, read: value }) : ({ ...msg, read: msg.read }));
-    this.setState({ allMessages: newList })
+    this.setNewState(newList);
   }
 
-  deleteMsg = () => {
-    let newList = this.state.allMessages.filter(msg => msg.selected != true);
-    this.setState({ allMessages: newList })
+  addLabel = (lbl) => {
+    console.log(lbl)
+        
+    let newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, labels: [...msg.labels, lbl] }) : msg);
+    
+    this.setNewState(newList);
+  }
+
+  removeLabel = (msg, lblRemoveVal) => {
+    let newLblArray = msg.labels.filter(msgLbl => msgLbl !== lblRemoveVal)
+    return newLblArray;
+  }
+
+  handleOnDelete = (lblRemoveVal) => {
+    let newList = [];
+
+    if (lblRemoveVal === "Remove Label") {
+      newList = this.state.allMessages.filter(msg => msg.selected !== true);
+    } else {
+      newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, labels: this.removeLabel(msg, lblRemoveVal) }) : ({ ...msg, labels: msg.labels }));
+    }
+
+    this.setNewState(newList);
   }
 
   render() {
-    { console.log("App is rendered") }
 
     return (
       <div className="App">
-        <Toolbar allMessages={this.state.allMessages} selectAll={this.selectAll} deleteMsg={this.deleteMsg} markAsRead={this.markAsRead} />
+        <Toolbar
+          allMessages={this.state.allMessages}
+          selectAll={this.selectAll}
+          handleOnDelete={this.handleOnDelete}
+          markAsRead={this.markAsRead}
+          addLabel={this.addLabel}
+        />
         <form className="form-horizontal well">
           <div className="form-group">
             <div className="col-sm-8 col-sm-offset-2">
@@ -67,7 +93,11 @@ class App extends Component {
             </div>
           </div>
         </form>
-        <MessageList key={this.state.allMessages} allMessages={this.state.allMessages} selectOne={this.selectOne} setStarred={this.setStarred} />
+        <MessageList
+          allMessages={this.state.allMessages}
+          selectOne={this.selectOne}
+          setStarred={this.setStarred}
+        />
       </div>
     )
   }

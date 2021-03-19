@@ -3,22 +3,27 @@ import { Component } from "react";
 class Message extends Component {
 
   render() {
-    return (<div className={"row message " + (this.props.message.read ? "read " : "unread ") + (this.props.message.selected ? "selected" : "")}>
+    const msg = this.props.message;
+    const checked = <input type="checkbox" checked="checked" onClick={this.props.selectOne.bind(this, msg.id)} />;
+    const unchecked = <input type="checkbox" onClick={this.props.selectOne.bind(this, msg.id)} />;
+
+    return (<div className={"row message " + (msg.read ? "read " : "unread ") + (msg.selected ? "selected" : "")}>
       <div className="col-xs-1">
         <div className="row">
           <div className="col-xs-2">
-            {this.props.message.selected ? <input type="checkbox" checked="checked" onChange={this.props.selectOne.bind(this, this.props.message.id)} /> : <input type="checkbox" onChange={this.props.selectOne.bind(this, this.props.message.id)} />}
+            {msg.selected ? checked : unchecked}
           </div>
           <div className="col-xs-2">
-            {this.props.message.starred ? <i className="star fa fa-star" onClick={this.props.setStarred.bind(this, this.props.message.id)}></i> : <i className="star fa fa-star-o" onClick={this.props.setStarred.bind(this, this.props.message.id)}></i>}
+            <i className={msg.starred ? "star fa fa-star" : "star fa fa-star-o"} onClick={this.props.setStarred.bind(this, msg.id)} />
           </div>
         </div>
       </div>
       <div className="col-xs-11">
-        {this.props.message.labels.find(label => label === "dev") === "dev" ? <span className="label label-warning">dev</span> : null}
-        {this.props.message.labels.find(label => label === "personal") === "personal" ? <span className="label label-warning">gschool</span> : null}
+        {msg.labels.find(label => label === "dev") === "dev" ? <span className="label label-warning">dev</span> : null}
+        {msg.labels.find(label => label === "personal") === "personal" ? <span className="label label-warning">personal</span> : null}
+        {msg.labels.find(label => label === "gschool") === "gschool" ? <span className="label label-warning">gschool</span> : null}
         <a href="#">
-          {this.props.message.subject}
+          {msg.subject}
         </a>
       </div>
     </div>)

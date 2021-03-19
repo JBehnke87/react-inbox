@@ -2,9 +2,18 @@ import { Component } from "react";
 import Message from './Message'
 
 class MessageList extends Component {
+
     render() {
         return (<div className="container">
-            { this.props.allMessages.map((listItem, i) => <Message key={i} allMessages={this.props.allMessages} message={listItem} selectOne={this.props.selectOne} setStarred={this.props.setStarred} />)}
+            { this.props.allMessages.map((msg, i) =>
+                <Message
+                    key={i}
+                    message={msg}
+                    allMessages={this.props.allMessages}
+                    selectOne={this.props.selectOne}
+                    setStarred={this.props.setStarred}
+                />)
+            }
         </div>)
     }
 
