@@ -7,7 +7,14 @@ import { Component } from 'react';
 
 class App extends Component {
 
-  state = { allMessages: dataList }
+  state = { allMessages: [] }
+
+  async componentDidMount() {
+    const response = await fetch("http://localhost:8082/api/messages?delay=3000");
+    const json = await response.json();
+
+    this.setState({ allMessages: json })
+  }
 
   setNewState = (newList) => {
     this.setState({ allMessages: newList })
