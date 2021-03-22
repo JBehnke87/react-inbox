@@ -1,19 +1,46 @@
 import './App.css';
 import MessageList from './MessageList'
 import Toolbar from './Toolbar'
-import dataList from './data'
 
 import { Component } from 'react';
+import ComposeForm from './ComposeForm';
 
 class App extends Component {
 
-  state = { allMessages: [] }
+  state = { allMessages: [], isComposeFormVisible: false }
 
   async componentDidMount() {
-    const response = await fetch("http://localhost:8082/api/messages?delay=3000");
-    const json = await response.json();
+    await this.updateListFromServer();
+  }
 
-    this.setState({ allMessages: json })
+  async updateListFromServer() {
+    const response = await fetch("http://localhost:8082/api/messages");
+    const json = await response.json();
+    this.setState({ allMessages: json });
+  }
+
+  async updateMsg(body) {
+    await fetch("http://localhost:8082/api/messages", {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }
+
+  async addMessageToServer(body) {
+    await fetch("http://localhost:8082/api/messages", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }
+
+  toggleComposeFormVisibility = () => {
+    this.setState({ isComposeFormVisible: !this.state.isComposeFormVisible })
   }
 
   setNewState = (newList) => {
@@ -21,6 +48,8 @@ class App extends Component {
   }
 
   setStarred = (id) => {
+    this.updateStarredStatusOnServer(id);
+
     let newList = this.state.allMessages.map(msg => msg.id === id ? ({ ...msg, starred: !msg.starred }) : ({ ...msg, starred: msg.starred }));
     this.setNewState(newList);
   }
@@ -37,18 +66,22 @@ class App extends Component {
 
   markAsRead = (value) => {
     let newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, read: value }) : ({ ...msg, read: msg.read }));
+
+    this.updateReadStatusOnServer(value);
+
     this.setNewState(newList);
   }
 
   addLabel = (lbl) => {
-    console.log(lbl)
-        
+    this.addMsgLabelToServer(lbl);
+
     let newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, labels: [...msg.labels, lbl] }) : msg);
-    
     this.setNewState(newList);
   }
 
   removeLabel = (msg, lblRemoveVal) => {
+    this.removeMsgLabelFromServer(lblRemoveVal);
+
     let newLblArray = msg.labels.filter(msgLbl => msgLbl !== lblRemoveVal)
     return newLblArray;
   }
@@ -58,11 +91,55 @@ class App extends Component {
 
     if (lblRemoveVal === "Remove Label") {
       newList = this.state.allMessages.filter(msg => msg.selected !== true);
+      this.removeMsgFromServer();
     } else {
       newList = this.state.allMessages.map(msg => msg.selected === true ? ({ ...msg, labels: this.removeLabel(msg, lblRemoveVal) }) : ({ ...msg, labels: msg.labels }));
     }
 
     this.setNewState(newList);
+  }
+
+  addNewMessage = (msg) => {
+    const body = {
+      subject: msg.subject,
+      read: false,
+      starred: false,
+      labels: [],
+      body: msg.body,
+      id: this.state.allMessages.length + 1
+    }
+    this.addMessageToServer(body);
+
+    this.setNewState([...this.state.allMessages, body]);
+  }
+
+  removeMsgFromServer() {
+    let idsToUpdate = this.state.allMessages.filter(msg => msg.selected === true).map(msg => msg.id);
+    const body = { "messageIds": idsToUpdate, command: "delete" };
+    this.updateMsg(body);
+  }
+
+  removeMsgLabelFromServer(lbl) {
+    let idsToUpdate = this.state.allMessages.filter(msg => msg.selected === true).map(msg => msg.id);
+    const body = { "messageIds": idsToUpdate, command: "removeLabel", label: lbl };
+    this.updateMsg(body);
+  }
+
+  addMsgLabelToServer(lbl) {
+    let idsToUpdate = this.state.allMessages.filter(msg => msg.selected === true).map(msg => msg.id);
+    const body = { "messageIds": idsToUpdate, command: "addLabel", label: lbl };
+    this.updateMsg(body);
+  }
+
+  updateStarredStatusOnServer(id) {
+    const body = { "messageIds": [...[], id], command: "star" };
+    this.updateMsg(body);
+  }
+
+  updateReadStatusOnServer(value) {
+    let idsToUpdate = this.state.allMessages.filter(msg => msg.selected === true).map(msg => msg.id);
+    const body = { "messageIds": idsToUpdate, command: "read", read: value };
+    this.updateMsg(body);
   }
 
   render() {
@@ -75,31 +152,10 @@ class App extends Component {
           handleOnDelete={this.handleOnDelete}
           markAsRead={this.markAsRead}
           addLabel={this.addLabel}
+          isComposeFormVisible={this.state.isComposeFormVisible}
+          toggleComposeFormVisibility={this.toggleComposeFormVisibility}
         />
-        <form className="form-horizontal well">
-          <div className="form-group">
-            <div className="col-sm-8 col-sm-offset-2">
-              <h4>Compose Message</h4>
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="subject" className="col-sm-2 control-label">Subject</label>
-            <div className="col-sm-8">
-              <input type="text" className="form-control" id="subject" placeholder="Enter a subject" name="subject"></input>
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="body" className="col-sm-2 control-label">Body</label>
-            <div className="col-sm-8">
-              <textarea name="body" id="body" className="form-control"></textarea>
-            </div>
-          </div>
-          <div className="form-group">
-            <div className="col-sm-8 col-sm-offset-2">
-              <input type="submit" value="Send" className="btn btn-primary"></input>
-            </div>
-          </div>
-        </form>
+        { this.state.isComposeFormVisible ? <ComposeForm addNewMessage={this.addNewMessage} /> : null}
         <MessageList
           allMessages={this.state.allMessages}
           selectOne={this.selectOne}
